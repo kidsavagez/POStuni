@@ -96,7 +96,15 @@ sudo bash deploy.sh tuni.yourdomain.com you@email.com
 #                   └─ full subdomain    └─ email for Let's Encrypt (omit to skip HTTPS)
 ```
 
-Re-run the same command anytime to redeploy the latest code. For the manual
+For routine **code updates** afterwards, use the lightweight updater instead —
+it pulls, rebuilds, and restarts **without** re-running Certbot/SSL (your cert
+auto-renews on its own):
+
+```bash
+sudo bash /var/www/tuni/update.sh
+```
+
+Only re-run `deploy.sh` when infrastructure or TLS changes. For the manual
 walk-through, see below.
 
 ---
