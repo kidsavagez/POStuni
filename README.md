@@ -83,6 +83,24 @@ npm start                   # node server.js
 
 ---
 
+## ⚡ Quick Deploy (one-shot script)
+
+If your VPS already has Nginx and your subdomain's DNS A record points to it,
+just run the included script — it installs Node/PM2/Certbot as needed, clones,
+builds, configures Nginx, starts PM2, and sets up HTTPS:
+
+```bash
+# On the VPS:
+curl -fsSL https://raw.githubusercontent.com/kidsavagez/POStuni/main/deploy.sh -o deploy.sh
+sudo bash deploy.sh tuni.yourdomain.com you@email.com
+#                   └─ full subdomain    └─ email for Let's Encrypt (omit to skip HTTPS)
+```
+
+Re-run the same command anytime to redeploy the latest code. For the manual
+walk-through, see below.
+
+---
+
 ## ☁️ Deploy to a VPS (Nginx + PM2)
 
 ### 1. Get the code & install
