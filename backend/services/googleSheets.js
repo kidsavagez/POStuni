@@ -14,25 +14,19 @@ function getConfig() {
   return c;
 }
 
-/**
- * Push one row to the Google Sheet via the Apps Script web-app webhook.
- * Fire-and-forget: never throws, so a Sheets outage can't break the app.
- *
- * @param {string} type  - sheet/tab name (e.g. 'Orders', 'Customers')
- * @param {object} row   - { columnName: value, ... }
- * @param {string} [key] - field in `row` used as the unique id for upsert
- *                          (e.g. 'order_id'). Omit to always append.
- */
-async function syncRow(type, row, key) {
+/** True when a webhook URL has been configured (regardless of the enable toggle). */
+function isConfigured() {
+  return !!getConfig().sheets_webhook_url;
+}
+
+/** Low-level POST to the Apps Script web app. Returns true on success. */
+async function _send(c, type, row, key) {
+  if (!c.sheets_webhook_url) return false;
+  if (typeof fetch !== 'function') {
+    console.error('[Sheets] global fetch unavailable (needs Node 18+).');
+    return false;
+  }
   try {
-    const c = getConfig();
-    if (c.sheets_sync_enabled !== '1' || !c.sheets_webhook_url) return;
-
-    if (typeof fetch !== 'function') {
-      console.error('[Sheets] global fetch unavailable (needs Node 18+).');
-      return;
-    }
-
     const res = await fetch(c.sheets_webhook_url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -46,10 +40,36 @@ async function syncRow(type, row, key) {
     });
     if (!res.ok) {
       console.error(`[Sheets] sync ${type} failed: HTTP ${res.status}`);
+      return false;
     }
+    return true;
   } catch (err) {
     console.error(`[Sheets] sync ${type} error:`, err.message);
+    return false;
   }
 }
 
-module.exports = { syncRow };
+/**
+ * Push one row to the Sheet for automatic, event-driven sync.
+ * No-ops unless sync is enabled AND a webhook URL is set.
+ * Fire-and-forget: never throws.
+ *
+ * @param {string} type  - sheet/tab name (e.g. 'Orders', 'Customers')
+ * @param {object} row   - { columnName: value, ... }
+ * @param {string} [key] - field in `row` used as the unique id for upsert
+ */
+async function syncRow(type, row, key) {
+  const c = getConfig();
+  if (c.sheets_sync_enabled !== '1' || !c.sheets_webhook_url) return;
+  await _send(c, type, row, key);
+}
+
+/**
+ * Push one row regardless of the enable toggle (used by "sync everything now").
+ * Requires only that a webhook URL is configured. Returns true on success.
+ */
+async function pushRow(type, row, key) {
+  return _send(getConfig(), type, row, key);
+}
+
+module.exports = { syncRow, pushRow, isConfigured };

@@ -43,6 +43,7 @@ export const api = {
   // Settings
   getSettings: () => axios.get('/settings'),
   updateSettings: (data) => axios.put('/settings', data),
+  syncSheetsAll: () => axios.post('/settings/sheets/sync-all'),
 
   // Audit
   getAuditLog: (page = 1) => axios.get(`/audit?page=${page}&limit=50`),

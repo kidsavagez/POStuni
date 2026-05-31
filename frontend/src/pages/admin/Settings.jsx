@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api'
-import { Settings, Save, Bot, Building2, CreditCard, Hash, Sheet } from 'lucide-react'
+import { Settings, Save, Bot, Building2, CreditCard, Hash, Sheet, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const SECTION_TABS = [
@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [tab, setTab] = useState('company')
 
   useEffect(() => {
@@ -52,6 +53,21 @@ export default function SettingsPage() {
       toast.success('Pengaturan disimpan!')
     } catch { toast.error('Gagal menyimpan pengaturan') }
     finally { setSaving(false) }
+  }
+
+  const handleSyncAll = async () => {
+    setSyncing(true)
+    try {
+      // Persist webhook config first so the backend reads the latest URL/secret.
+      await api.updateSettings(settings)
+      const { data } = await api.syncSheetsAll()
+      const c = data.counts
+      toast.success(`Tersinkron: ${c.orders} pesanan, ${c.customers} pelanggan, ${c.products} produk, ${c.invoices} invoice`)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Sinkronisasi gagal')
+    } finally {
+      setSyncing(false)
+    }
   }
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /></div>
@@ -173,6 +189,22 @@ export default function SettingsPage() {
           </label>
           <Field label="Webhook URL (Apps Script)" skey="sheets_webhook_url" placeholder="https://script.google.com/macros/s/.../exec" hint="Web app URL dari deployment Apps Script" settings={settings} update={update} />
           <Field label="Secret Token" skey="sheets_webhook_secret" placeholder="kata-sandi-rahasia-anda" hint="Harus sama persis dengan nilai SECRET di skrip Apps Script" settings={settings} update={update} />
+          <div className="border-t border-surface-border pt-4">
+            <button
+              id="btn-sync-sheets"
+              onClick={handleSyncAll}
+              disabled={syncing || !settings.sheets_webhook_url}
+              className="btn-secondary text-sm"
+            >
+              {syncing
+                ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Menyinkronkan...</>
+                : <><RefreshCw className="w-4 h-4" /> Sync Semua Sekarang</>}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Kirim semua data yang sudah ada (pesanan, pelanggan, produk, invoice) ke Google Sheet.
+              Otomatis menyimpan pengaturan terlebih dahulu.
+            </p>
+          </div>
         </>}
       </div>
     </div>
