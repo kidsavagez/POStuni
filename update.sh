@@ -20,6 +20,10 @@ main() {
   if [ "$(id -u)" -eq 0 ]; then SUDO=""; else SUDO="sudo"; fi
   say() { printf '\n\033[1;36m▶ %s\033[0m\n' "$*"; }
 
+  # The repo is root-owned (cloned via sudo); tell git that's trusted.
+  $SUDO git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$APP_DIR" \
+    || $SUDO git config --global --add safe.directory "$APP_DIR"
+
   say "Pulling latest code..."
   $SUDO git -C "$APP_DIR" pull --ff-only
 

@@ -52,6 +52,10 @@ fi
 # ─── 3. Clone or update the repo ────────────────────────────────────────────
 if [ -d "$APP_DIR/.git" ]; then
   say "Updating existing checkout at $APP_DIR..."
+  # Repo is root-owned (cloned via sudo); mark it trusted to avoid git's
+  # "dubious ownership" error.
+  $SUDO git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$APP_DIR" \
+    || $SUDO git config --global --add safe.directory "$APP_DIR"
   $SUDO git -C "$APP_DIR" pull --ff-only
 else
   say "Cloning $REPO → $APP_DIR..."
