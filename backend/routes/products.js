@@ -7,6 +7,7 @@ const { verifyToken }     = require('../middleware/auth');
 const { requireAdmin }    = require('../middleware/roleGuard');
 const { generateProductId } = require('../services/idGenerator');
 const { logAction }       = require('../services/auditLog');
+const sheets              = require('../services/googleSheets');
 
 const router = express.Router();
 
@@ -91,6 +92,17 @@ router.post('/', requireAdmin, (req, res) => {
 
     const product = db.prepare(`SELECT * FROM products WHERE product_id = ?`).get(product_id);
     logAction(db, req.user.user_id, 'CREATE_PRODUCT', 'products', product_id, '', product);
+
+    sheets.syncRow('Products', {
+      product_id:      product.product_id,
+      name:            product.name,
+      price:           product.price,
+      unit:            product.unit,
+      stock_qty:       product.stock_qty,
+      low_stock_alert: product.low_stock_alert,
+      description:     product.description,
+      created_at:      product.created_at,
+    }, 'product_id');
 
     return res.status(201).json({ product });
   } catch (err) {

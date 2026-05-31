@@ -150,6 +150,9 @@ const defaultSettings = [
   ['invoice_seq_padding',  '3'],
   ['telegram_bot_token',   ''],
   ['telegram_admin_chat_id', ''],
+  ['sheets_sync_enabled',  '0'],
+  ['sheets_webhook_url',   ''],
+  ['sheets_webhook_secret', ''],
 ];
 
 const insertSetting = db.prepare(

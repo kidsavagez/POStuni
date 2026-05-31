@@ -1,6 +1,7 @@
 'use strict';
 
 const TelegramBot = require('node-telegram-bot-api');
+const sheets      = require('./googleSheets');
 
 let bot = null;
 let _adminChatId = null;
@@ -172,6 +173,17 @@ async function approveOrderFromBot(db, orderId, fromUser) {
 
   logAction(db, actorLabel, 'APPROVE_ORDER', 'orders', orderId, { status: 'pending' }, { status: 'approved', invoice_id: invoiceId });
 
+  // Sync to Google Sheets
+  const approvedCustomer = db.prepare(`SELECT name FROM customers WHERE customer_id = ?`).get(order.customer_id);
+  sheets.syncRow('Orders', {
+    order_id: orderId, status: 'approved', approved_at: now, approved_by: actorLabel, invoice_id: invoiceId,
+  }, 'order_id');
+  sheets.syncRow('Invoices', {
+    invoice_id: invoiceId, order_id: orderId,
+    customer: approvedCustomer ? approvedCustomer.name : order.customer_id,
+    total_amount: order.total_amount, issued_at: now,
+  }, 'invoice_id');
+
   // Notify sales person
   const salesUser = db.prepare(`SELECT * FROM users WHERE user_id = ?`).get(order.sales_id);
   if (salesUser && salesUser.telegram_chat_id) {
@@ -202,6 +214,9 @@ async function rejectOrderFromBot(db, orderId, fromUser) {
   ).run(reason, orderId);
 
   logAction(db, actorLabel, 'REJECT_ORDER', 'orders', orderId, { status: 'pending' }, { status: 'rejected', reason });
+
+  // Sync to Google Sheets
+  sheets.syncRow('Orders', { order_id: orderId, status: 'rejected', rejection_reason: reason }, 'order_id');
 
   // Notify sales person
   const salesUser = db.prepare(`SELECT * FROM users WHERE user_id = ?`).get(order.sales_id);

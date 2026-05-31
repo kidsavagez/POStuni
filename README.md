@@ -225,6 +225,25 @@ POStuni/
 
 ---
 
+## 📊 Live Google Sheets Sync (optional)
+
+Auto-append rows to a Google Sheet whenever an order, customer, product, or
+invoice is created/updated — no manual export needed. One-way (app → Sheet),
+real-time, via a Google Apps Script web app (no Google Cloud project required).
+
+**Setup (once):**
+1. Create a Google Sheet → **Extensions → Apps Script**.
+2. Paste the code from [`google-apps-script.gs`](google-apps-script.gs); set `SECRET` to a private password.
+3. **Deploy → New deployment → Web app** (Execute as: Me, Access: Anyone). Copy the Web app URL.
+4. In the app: **Admin → Pengaturan → Google Sheets** → paste the URL + the same secret, tick **Aktifkan sinkronisasi**, Simpan.
+
+Each record type lands in its own tab (Orders, Customers, Products, Invoices).
+Rows keyed by id are *upserted* — an order appears on create, then updates in
+place on approve/reject. Sync is fire-and-forget: if Sheets is unreachable the
+app keeps working normally.
+
+---
+
 ## 🔢 Configurable Auto-ID Formats
 
 Edit under **Admin → Pengaturan → Format ID**:

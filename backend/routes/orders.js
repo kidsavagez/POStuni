@@ -7,6 +7,7 @@ const { requireAdmin }     = require('../middleware/roleGuard');
 const { generateOrderId, generateInvoiceId } = require('../services/idGenerator');
 const { logAction }        = require('../services/auditLog');
 const telegramBot          = require('../services/telegramBot');
+const sheets               = require('../services/googleSheets');
 
 const router = express.Router();
 
@@ -182,6 +183,23 @@ router.post('/', (req, res) => {
     telegramBot.sendOrderNotification(order, customer, salesUser ? salesUser.name : req.user.name)
       .catch(err => console.error('[Orders] Telegram notify error:', err.message));
 
+    sheets.syncRow('Orders', {
+      order_id:        order.order_id,
+      customer:        customer.name,
+      sales:           salesUser ? salesUser.name : req.user.name,
+      status:          order.status,
+      subtotal:        order.subtotal,
+      discount_amount: order.discount_amount,
+      tax_amount:      order.tax_amount,
+      total_amount:    order.total_amount,
+      note:            order.note,
+      created_at:      order.created_at,
+      approved_at:     '',
+      approved_by:     '',
+      rejection_reason:'',
+      invoice_id:      '',
+    }, 'order_id');
+
     return res.status(201).json({ order, items: resolvedItems });
   } catch (err) {
     console.error('[Orders] POST / error:', err.message);
@@ -229,6 +247,23 @@ router.put('/:id/approve', requireAdmin, (req, res) => {
       { status: 'approved', invoice_id: invoiceId }
     );
 
+    // Sync to Google Sheets: update the order row + add the invoice row
+    const approvedCustomer = db.prepare(`SELECT name FROM customers WHERE customer_id = ?`).get(order.customer_id);
+    sheets.syncRow('Orders', {
+      order_id:    req.params.id,
+      status:      'approved',
+      approved_at: now,
+      approved_by: req.user.user_id,
+      invoice_id:  invoiceId,
+    }, 'order_id');
+    sheets.syncRow('Invoices', {
+      invoice_id:   invoiceId,
+      order_id:     req.params.id,
+      customer:     approvedCustomer ? approvedCustomer.name : order.customer_id,
+      total_amount: order.total_amount,
+      issued_at:    now,
+    }, 'invoice_id');
+
     // Notify sales via Telegram
     const salesUser = db.prepare(`SELECT * FROM users WHERE user_id = ?`).get(order.sales_id);
     if (salesUser && salesUser.telegram_chat_id) {
@@ -268,6 +303,12 @@ router.put('/:id/reject', requireAdmin, (req, res) => {
       { status: 'pending' },
       { status: 'rejected', rejection_reason }
     );
+
+    sheets.syncRow('Orders', {
+      order_id:         req.params.id,
+      status:           'rejected',
+      rejection_reason: rejection_reason,
+    }, 'order_id');
 
     // Notify sales via Telegram
     const salesUser = db.prepare(`SELECT * FROM users WHERE user_id = ?`).get(order.sales_id);

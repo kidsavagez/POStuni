@@ -7,6 +7,7 @@ const { verifyToken }      = require('../middleware/auth');
 const { requireAdmin }     = require('../middleware/roleGuard');
 const { generateCustomerId } = require('../services/idGenerator');
 const { logAction }        = require('../services/auditLog');
+const sheets               = require('../services/googleSheets');
 
 const router = express.Router();
 
@@ -76,6 +77,15 @@ router.post('/', requireAdmin, (req, res) => {
 
     const customer = db.prepare(`SELECT * FROM customers WHERE customer_id = ?`).get(customer_id);
     logAction(db, req.user.user_id, 'CREATE_CUSTOMER', 'customers', customer_id, '', customer);
+
+    sheets.syncRow('Customers', {
+      customer_id: customer.customer_id,
+      name:        customer.name,
+      email:       customer.email,
+      phone:       customer.phone,
+      address:     customer.address,
+      created_at:  customer.created_at,
+    }, 'customer_id');
 
     return res.status(201).json({ customer });
   } catch (err) {

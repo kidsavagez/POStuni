@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api'
-import { Settings, Save, Bot, Building2, CreditCard, Hash } from 'lucide-react'
+import { Settings, Save, Bot, Building2, CreditCard, Hash, Sheet } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const SECTION_TABS = [
@@ -8,6 +8,7 @@ const SECTION_TABS = [
   { key: 'id',       label: 'Format ID',          icon: Hash },
   { key: 'tax',      label: 'Pajak & Invoice',    icon: CreditCard },
   { key: 'telegram', label: 'Telegram Bot',       icon: Bot },
+  { key: 'sheets',   label: 'Google Sheets',      icon: Sheet },
 ]
 
 // Defined at module scope (not inside SettingsPage) so its identity is stable
@@ -147,6 +148,31 @@ export default function SettingsPage() {
           </div>
           <Field label="Bot Token" skey="telegram_bot_token" placeholder="123456789:ABC-DEF..." hint="Token dari @BotFather" settings={settings} update={update} />
           <Field label="Admin Chat ID" skey="telegram_admin_chat_id" placeholder="123456789" hint="Chat ID Telegram admin (dari @userinfobot)" settings={settings} update={update} />
+        </>}
+
+        {tab === 'sheets' && <>
+          <h3 className="font-semibold text-white border-b border-surface-border pb-3">Sinkronisasi Google Sheets</h3>
+          <div className="bg-info/10 border border-info/20 rounded-lg p-4 space-y-2">
+            <p className="text-info text-sm font-semibold">📊 Cara Setup (sekali saja):</p>
+            <ol className="text-xs text-gray-400 space-y-1 list-decimal list-inside">
+              <li>Buka Google Sheet baru → menu <span className="text-white font-mono">Extensions → Apps Script</span></li>
+              <li>Tempel kode dari file <span className="text-white font-mono">google-apps-script.gs</span> (ada di repo)</li>
+              <li>Ganti <span className="text-white font-mono">SECRET</span> di skrip dengan Secret Token di bawah</li>
+              <li>Klik <span className="text-white font-mono">Deploy → New deployment → Web app</span>, akses: <span className="text-white">Anyone</span></li>
+              <li>Salin <strong className="text-white">Web app URL</strong> ke kolom Webhook URL di bawah, lalu Simpan</li>
+            </ol>
+          </div>
+          <label className="flex items-center gap-3 cursor-pointer select-none py-1">
+            <input
+              type="checkbox"
+              className="w-4 h-4 accent-primary-500"
+              checked={settings.sheets_sync_enabled === '1'}
+              onChange={e => update('sheets_sync_enabled', e.target.checked ? '1' : '0')}
+            />
+            <span className="text-sm text-white">Aktifkan sinkronisasi otomatis ke Google Sheets</span>
+          </label>
+          <Field label="Webhook URL (Apps Script)" skey="sheets_webhook_url" placeholder="https://script.google.com/macros/s/.../exec" hint="Web app URL dari deployment Apps Script" settings={settings} update={update} />
+          <Field label="Secret Token" skey="sheets_webhook_secret" placeholder="kata-sandi-rahasia-anda" hint="Harus sama persis dengan nilai SECRET di skrip Apps Script" settings={settings} update={update} />
         </>}
       </div>
     </div>
