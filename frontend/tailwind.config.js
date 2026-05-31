@@ -7,29 +7,37 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Primary = Deep Teal (#648381)
         primary: {
-          50:  '#f0f4ff',
-          100: '#e0e9ff',
-          200: '#c7d6fe',
-          300: '#a5b8fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50:  '#eef5f4',
+          100: '#d7e6e4',
+          200: '#b4cfcd',
+          300: '#a3c7c5',
+          400: '#86b3b0',
+          500: '#648381',
+          600: '#557572',
+          700: '#46605e',
+          800: '#3a4f4e',
+          900: '#304140',
+          950: '#1c2625',
         },
+        // Dark surfaces tinted toward Charcoal (#575761)
         surface: {
-          DEFAULT: '#0f0f1a',
-          card:    '#1a1a2e',
-          border:  '#2a2a45',
-          hover:   '#22223a',
+          DEFAULT: '#2a2a31',
+          card:    '#34343d',
+          border:  '#474751',
+          hover:   '#3e3e48',
         },
-        success: '#22c55e',
-        warning: '#f59e0b',
-        danger:  '#ef4444',
-        info:    '#38bdf8',
+        success: '#8ACB88',  // Willow Green
+        warning: '#FFBF46',  // Sunflower Gold
+        danger:  '#e2655f',  // soft red (no red in palette; kept for delete/reject)
+        info:    '#7fb0ac',  // light teal
+        // Raw palette swatches for direct use
+        mint:    '#E4FDE1',  // Frosted Mint
+        willow:  '#8ACB88',  // Willow Green
+        teal:    '#648381',  // Deep Teal
+        charcoal:'#575761',  // Charcoal
+        gold:    '#FFBF46',  // Sunflower Gold
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -14,7 +14,7 @@ import toast from 'react-hot-toast'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
-const COLORS = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#22c55e','#38bdf8','#f97316','#a855f7']
+const COLORS = ['#8ACB88','#648381','#FFBF46','#575761','#a3c7c5','#5a9d58','#e0a93a','#7fb0ac']
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
@@ -143,8 +143,8 @@ export default function AdminDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Pelanggan', value: custCount, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-          { label: 'Total Produk', value: stats?.totalProducts || 0, icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+          { label: 'Total Pelanggan', value: custCount, icon: Users, color: 'text-primary-400', bg: 'bg-primary-500/10' },
+          { label: 'Total Produk', value: stats?.totalProducts || 0, icon: Package, color: 'text-info', bg: 'bg-info/10' },
           { label: 'Menunggu Persetujuan', value: stats?.pendingCount || 0, icon: Clock, color: 'text-warning', bg: 'bg-warning/10' },
           { label: 'Total Pendapatan', value: formatIDR(stats?.totalRevenue || 0), icon: TrendingUp, color: 'text-success', bg: 'bg-success/10' },
         ].map((kpi, i) => (
@@ -223,7 +223,7 @@ export default function AdminDashboard() {
                 datasets: [{
                   label: 'Pendapatan',
                   data: (stats?.dailyRevenue || []).map(d => d.total),
-                  backgroundColor: '#6366f1',
+                  backgroundColor: '#8ACB88',
                   borderRadius: 6,
                 }],
               }}

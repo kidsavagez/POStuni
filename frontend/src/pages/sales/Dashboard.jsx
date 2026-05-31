@@ -26,7 +26,7 @@ export default function SalesDashboard() {
       {/* Greeting */}
       <div className="card gradient-primary border-0">
         <h1 className="text-xl font-bold text-white">Selamat datang, {user?.name}! 👋</h1>
-        <p className="text-indigo-200 text-sm mt-1">Siap membuat pesanan baru hari ini?</p>
+        <p className="text-white/80 text-sm mt-1">Siap membuat pesanan baru hari ini?</p>
         <Link to="/sales/new-order" id="btn-new-order-dash" className="inline-flex items-center gap-2 mt-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
           <PlusCircle className="w-4 h-4" /> Buat Pesanan Baru
         </Link>
@@ -35,7 +35,7 @@ export default function SalesDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Pesanan', value: orders.length, icon: ClipboardList, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+          { label: 'Total Pesanan', value: orders.length, icon: ClipboardList, color: 'text-info', bg: 'bg-info/10' },
           { label: 'Menunggu', value: pending.length, icon: Clock, color: 'text-warning', bg: 'bg-warning/10' },
           { label: 'Disetujui', value: approved.length, icon: CheckCircle, color: 'text-success', bg: 'bg-success/10' },
           { label: 'Total Nilai', value: formatIDR(totalRev), icon: TrendingUp, color: 'text-primary-400', bg: 'bg-primary-600/10' },

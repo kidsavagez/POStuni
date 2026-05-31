@@ -80,7 +80,7 @@ export default function InvoicePage() {
         style={{ fontFamily: 'Inter, Arial, sans-serif' }}
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', padding: '32px 40px', color: 'white' }}>
+        <div style={{ background: 'linear-gradient(135deg, #648381 0%, #8ACB88 100%)', padding: '32px 40px', color: 'white' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               {settings?.company_logo_url && (
@@ -166,7 +166,7 @@ export default function InvoicePage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0 0', borderTop: '2px solid #111827', marginTop: '4px' }}>
               <span style={{ fontWeight: '800', fontSize: '15px', color: '#111827' }}>TOTAL</span>
-              <span style={{ fontWeight: '800', fontSize: '17px', color: '#4f46e5' }}>{formatIDR(order.total_amount)}</span>
+              <span style={{ fontWeight: '800', fontSize: '17px', color: '#557572' }}>{formatIDR(order.total_amount)}</span>
             </div>
           </div>
         </div>

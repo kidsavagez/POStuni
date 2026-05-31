@@ -152,7 +152,7 @@ export default function DatabaseEditor() {
                   <td className="table-td font-mono text-primary-400 text-xs">{r.user_id}</td>
                   <td className="table-td text-white">{r.name}</td>
                   <td className="table-td text-gray-400">{r.email}</td>
-                  <td className="table-td"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${r.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>{r.role}</span></td>
+                  <td className="table-td"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${r.role === 'admin' ? 'bg-warning/20 text-warning' : 'bg-primary-500/20 text-primary-400'}`}>{r.role}</span></td>
                   <td className="table-td text-gray-500 text-xs">{r.telegram_chat_id || '-'}</td>
                   <td className="table-td"><span className={`px-2 py-0.5 rounded-full text-xs ${r.is_active ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}`}>{r.is_active ? 'Aktif' : 'Nonaktif'}</span></td>
                   <td className="table-td text-xs text-gray-500">{formatDateTime(r.created_at)}</td>

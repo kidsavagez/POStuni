@@ -17,7 +17,7 @@ ChartJS.register(
   BarElement, PointElement, LineElement, Filler, Title
 )
 
-const COLORS = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#22c55e','#38bdf8','#f97316','#a855f7','#14b8a6','#eab308']
+const COLORS = ['#8ACB88','#648381','#FFBF46','#575761','#a3c7c5','#5a9d58','#e0a93a','#7fb0ac','#b9e9b4','#46605e']
 
 /** Today as YYYY-MM-DD (local). */
 const todayStr = () => {
@@ -84,8 +84,8 @@ export default function Analytics() {
     { label: 'Total Pendapatan', value: formatIDR(s?.totalRevenue || 0), icon: TrendingUp,  color: 'text-success',  bg: 'bg-success/10' },
     { label: 'Pesanan Disetujui', value: s?.approvedOrders ?? 0,         icon: CheckCircle, color: 'text-success',  bg: 'bg-success/10' },
     { label: 'Rata-rata Pesanan', value: formatIDR(s?.avgOrderValue || 0), icon: ShoppingCart, color: 'text-primary-400', bg: 'bg-primary-500/10' },
-    { label: 'Produk Terjual',   value: s?.totalItemsSold ?? 0,          icon: Package,     color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { label: 'Pelanggan Aktif',  value: s?.uniqueCustomers ?? 0,         icon: Users,       color: 'text-blue-400',  bg: 'bg-blue-500/10' },
+    { label: 'Produk Terjual',   value: s?.totalItemsSold ?? 0,          icon: Package,     color: 'text-info', bg: 'bg-info/10' },
+    { label: 'Pelanggan Aktif',  value: s?.uniqueCustomers ?? 0,         icon: Users,       color: 'text-mint',  bg: 'bg-mint/10' },
     { label: 'Menunggu',         value: s?.pendingOrders ?? 0,           icon: Clock,       color: 'text-warning',   bg: 'bg-warning/10' },
     { label: 'Ditolak',          value: s?.rejectedOrders ?? 0,          icon: XCircle,     color: 'text-danger',    bg: 'bg-danger/10' },
     { label: 'Total Pesanan',    value: s?.totalOrders ?? 0,             icon: BarChart3,   color: 'text-gray-300',  bg: 'bg-gray-500/10' },
@@ -201,7 +201,7 @@ export default function Analytics() {
                     datasets: [{
                       label: 'Pendapatan',
                       data: ts.map(d => d.revenue),
-                      backgroundColor: '#6366f1',
+                      backgroundColor: '#8ACB88',
                       borderRadius: 6,
                       maxBarThickness: 48,
                     }],

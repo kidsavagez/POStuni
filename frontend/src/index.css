@@ -51,13 +51,13 @@
 
 @layer utilities {
   .glass {
-    background: rgba(26, 26, 46, 0.8);
+    background: rgba(52, 52, 61, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-  .gradient-primary { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+  .gradient-primary { background: linear-gradient(135deg, #648381 0%, #8ACB88 100%); }
   .text-gradient {
-    background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+    background: linear-gradient(135deg, #8ACB88 0%, #E4FDE1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
