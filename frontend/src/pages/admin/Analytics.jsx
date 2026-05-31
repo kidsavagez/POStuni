@@ -3,8 +3,9 @@ import { api } from '../../api'
 import { formatIDR } from '../../utils/helpers'
 import {
   TrendingUp, ShoppingCart, Package, Users,
-  CheckCircle, Clock, XCircle, RefreshCw, BarChart3, Calendar
+  CheckCircle, Clock, XCircle, RefreshCw, BarChart3, Calendar, Download
 } from 'lucide-react'
+import * as XLSX from 'xlsx'
 import {
   Chart as ChartJS, ArcElement, Tooltip, Legend,
   CategoryScale, LinearScale, BarElement, PointElement, LineElement, Filler, Title
@@ -78,6 +79,48 @@ export default function Analytics() {
     load(nextFrom, nextTo, nextGroup)
   }
 
+  const handleExport = () => {
+    if (!data) return
+    const r = data.range
+    const s = data.summary
+    const wb = XLSX.utils.book_new()
+
+    // Sheet 1: summary
+    const summaryAoa = [
+      ['Laporan Analitik TuniOrder'],
+      ['Periode', `${r.from} s/d ${r.to}`],
+      ['Dikelompokkan', r.group],
+      [],
+      ['Metrik', 'Nilai'],
+      ['Total Pendapatan', s.totalRevenue],
+      ['Pesanan Disetujui', s.approvedOrders],
+      ['Rata-rata Pesanan', s.avgOrderValue],
+      ['Produk Terjual', s.totalItemsSold],
+      ['Pelanggan Aktif', s.uniqueCustomers],
+      ['Menunggu', s.pendingOrders],
+      ['Ditolak', s.rejectedOrders],
+      ['Total Pesanan', s.totalOrders],
+    ]
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryAoa), 'Ringkasan')
+
+    // Detail sheets
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+      (data.timeSeries || []).map(d => ({ Periode: d.bucket, Pendapatan: d.revenue, Pesanan: d.orders }))
+    ), 'Tren Pendapatan')
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+      (data.topProducts || []).map(p => ({ Produk: p.name, Qty: p.qty, Pendapatan: p.revenue }))
+    ), 'Produk Terlaris')
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+      (data.bySales || []).map(x => ({ Sales: x.name, Pesanan: x.orders, Pendapatan: x.revenue }))
+    ), 'Pendapatan per Sales')
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+      (data.topCustomers || []).map(c => ({ Pelanggan: c.name, Pesanan: c.orders, Total: c.revenue }))
+    ), 'Pelanggan Teratas')
+
+    XLSX.writeFile(wb, `analitik_${r.from}_sd_${r.to}.xlsx`)
+    toast.success('Laporan diexport ke Excel!')
+  }
+
   const s = data?.summary
 
   const kpis = [
@@ -102,9 +145,14 @@ export default function Analytics() {
           <h1 className="text-2xl font-bold text-white">Analitik &amp; Laporan</h1>
           <p className="text-gray-400 text-sm">Ringkasan performa penjualan berdasarkan periode</p>
         </div>
-        <button onClick={() => load(from, to, group)} className="btn-secondary text-sm">
-          <RefreshCw className="w-4 h-4" /> Refresh
-        </button>
+        <div className="flex gap-2">
+          <button onClick={handleExport} disabled={loading || !data} className="btn-primary text-sm">
+            <Download className="w-4 h-4" /> Export Excel
+          </button>
+          <button onClick={() => load(from, to, group)} className="btn-secondary text-sm">
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
