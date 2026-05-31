@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, LogIn, Package } from 'lucide-react'
@@ -9,8 +9,17 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
+
+  // Already signed in (e.g. typed the root URL or hit Back) → go to dashboard
+  // instead of showing the login form again.
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+  if (user) return <Navigate to={user.role === 'admin' ? '/admin' : '/sales'} replace />
 
   const handleSubmit = async (e) => {
     e.preventDefault()

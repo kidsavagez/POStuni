@@ -10,6 +10,25 @@ const SECTION_TABS = [
   { key: 'telegram', label: 'Telegram Bot',       icon: Bot },
 ]
 
+// Defined at module scope (not inside SettingsPage) so its identity is stable
+// across renders. A component re-created every render makes React remount the
+// <input> on each keystroke, which resets the caret to the end.
+function Field({ label, skey, type = 'text', placeholder = '', hint = '', settings, update }) {
+  return (
+    <div>
+      <label className="label">{label}</label>
+      <input
+        className="input"
+        type={type}
+        placeholder={placeholder}
+        value={settings[skey] || ''}
+        onChange={e => update(skey, e.target.value)}
+      />
+      {hint && <p className="text-xs text-gray-500 mt-1">{hint}</p>}
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState({})
   const [loading, setLoading] = useState(true)
@@ -33,20 +52,6 @@ export default function SettingsPage() {
     } catch { toast.error('Gagal menyimpan pengaturan') }
     finally { setSaving(false) }
   }
-
-  const Field = ({ label, skey, type = 'text', placeholder = '', hint = '' }) => (
-    <div>
-      <label className="label">{label}</label>
-      <input
-        className="input"
-        type={type}
-        placeholder={placeholder}
-        value={settings[skey] || ''}
-        onChange={e => update(skey, e.target.value)}
-      />
-      {hint && <p className="text-xs text-gray-500 mt-1">{hint}</p>}
-    </div>
-  )
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /></div>
 
@@ -83,16 +88,16 @@ export default function SettingsPage() {
           <p className="text-xs text-gray-500 bg-info/10 border border-info/20 rounded-lg p-3 text-info">
             ℹ️ Data ini akan tampil di invoice. Isi dengan data perusahaan Anda setelah aplikasi diterima.
           </p>
-          <Field label="Nama Perusahaan" skey="company_name" placeholder="PT. Nama Perusahaan Anda" />
+          <Field label="Nama Perusahaan" skey="company_name" placeholder="PT. Nama Perusahaan Anda" settings={settings} update={update} />
           <div>
             <label className="label">Alamat Perusahaan</label>
             <textarea className="input resize-none h-20" placeholder="Jl. Alamat No. 1, Kota, Provinsi" value={settings.company_address || ''} onChange={e => update('company_address', e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Telepon" skey="company_phone" placeholder="+62 812-xxx-xxxx" />
-            <Field label="Email" skey="company_email" type="email" placeholder="email@perusahaan.com" />
+            <Field label="Telepon" skey="company_phone" placeholder="+62 812-xxx-xxxx" settings={settings} update={update} />
+            <Field label="Email" skey="company_email" type="email" placeholder="email@perusahaan.com" settings={settings} update={update} />
           </div>
-          <Field label="URL Logo" skey="company_logo_url" placeholder="https://..." hint="URL gambar logo perusahaan (PNG/JPG)" />
+          <Field label="URL Logo" skey="company_logo_url" placeholder="https://..." hint="URL gambar logo perusahaan (PNG/JPG)" settings={settings} update={update} />
         </>}
 
         {tab === 'id' && <>
@@ -101,31 +106,31 @@ export default function SettingsPage() {
             ⚠️ Perubahan format ID hanya berlaku untuk record baru. ID yang sudah ada tidak berubah.
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Prefix Pelanggan" skey="customer_id_prefix" placeholder="CUST" />
-            <Field label="Padding Pelanggan" skey="customer_id_padding" type="number" placeholder="4" hint="Contoh: 4 → CUST-0001" />
+            <Field label="Prefix Pelanggan" skey="customer_id_prefix" placeholder="CUST" settings={settings} update={update} />
+            <Field label="Padding Pelanggan" skey="customer_id_padding" type="number" placeholder="4" hint="Contoh: 4 → CUST-0001" settings={settings} update={update} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Prefix Produk" skey="product_id_prefix" placeholder="PRD" />
-            <Field label="Padding Produk" skey="product_id_padding" type="number" placeholder="4" hint="Contoh: 4 → PRD-0001" />
+            <Field label="Prefix Produk" skey="product_id_prefix" placeholder="PRD" settings={settings} update={update} />
+            <Field label="Padding Produk" skey="product_id_padding" type="number" placeholder="4" hint="Contoh: 4 → PRD-0001" settings={settings} update={update} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Format Order ID" skey="order_id_format" placeholder="ORD-{DATE}-{SEQ}" hint="{DATE}=tanggal, {SEQ}=urutan" />
-            <Field label="Padding Urutan Order" skey="order_seq_padding" type="number" placeholder="3" />
+            <Field label="Format Order ID" skey="order_id_format" placeholder="ORD-{DATE}-{SEQ}" hint="{DATE}=tanggal, {SEQ}=urutan" settings={settings} update={update} />
+            <Field label="Padding Urutan Order" skey="order_seq_padding" type="number" placeholder="3" settings={settings} update={update} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Format Invoice ID" skey="invoice_id_format" placeholder="INV-{DATE}-{SEQ}" />
-            <Field label="Padding Urutan Invoice" skey="invoice_seq_padding" type="number" placeholder="3" />
+            <Field label="Format Invoice ID" skey="invoice_id_format" placeholder="INV-{DATE}-{SEQ}" settings={settings} update={update} />
+            <Field label="Padding Urutan Invoice" skey="invoice_seq_padding" type="number" placeholder="3" settings={settings} update={update} />
           </div>
         </>}
 
         {tab === 'tax' && <>
           <h3 className="font-semibold text-white border-b border-surface-border pb-3">Pajak & Informasi Bank</h3>
-          <Field label="Tarif PPN Default (%)" skey="default_tax_rate" type="number" placeholder="11" hint="Contoh: 11 untuk PPN 11%" />
+          <Field label="Tarif PPN Default (%)" skey="default_tax_rate" type="number" placeholder="11" hint="Contoh: 11 untuk PPN 11%" settings={settings} update={update} />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Nama Bank" skey="bank_name" placeholder="Bank BCA" />
-            <Field label="Nomor Rekening" skey="bank_account" placeholder="1234567890" />
+            <Field label="Nama Bank" skey="bank_name" placeholder="Bank BCA" settings={settings} update={update} />
+            <Field label="Nomor Rekening" skey="bank_account" placeholder="1234567890" settings={settings} update={update} />
           </div>
-          <Field label="Nama Pemilik Rekening" skey="bank_holder" placeholder="PT. Nama Perusahaan" />
+          <Field label="Nama Pemilik Rekening" skey="bank_holder" placeholder="PT. Nama Perusahaan" settings={settings} update={update} />
         </>}
 
         {tab === 'telegram' && <>
@@ -140,8 +145,8 @@ export default function SettingsPage() {
               <li>Isi kedua field di bawah ini dan simpan</li>
             </ol>
           </div>
-          <Field label="Bot Token" skey="telegram_bot_token" placeholder="123456789:ABC-DEF..." hint="Token dari @BotFather" />
-          <Field label="Admin Chat ID" skey="telegram_admin_chat_id" placeholder="123456789" hint="Chat ID Telegram admin (dari @userinfobot)" />
+          <Field label="Bot Token" skey="telegram_bot_token" placeholder="123456789:ABC-DEF..." hint="Token dari @BotFather" settings={settings} update={update} />
+          <Field label="Admin Chat ID" skey="telegram_admin_chat_id" placeholder="123456789" hint="Chat ID Telegram admin (dari @userinfobot)" settings={settings} update={update} />
         </>}
       </div>
     </div>
