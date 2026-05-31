@@ -123,16 +123,26 @@ $SUDO pm2 save
 # Enable PM2 on boot (best-effort)
 $SUDO env PATH="$PATH" pm2 startup systemd -u "$(whoami)" --hp "$HOME" >/dev/null 2>&1 || true
 
-# ─── 8. HTTPS via Let's Encrypt (optional) ──────────────────────────────────
-if [ -n "$EMAIL" ]; then
-  say "Setting up HTTPS for $DOMAIN..."
+# ─── 8. HTTPS via Let's Encrypt ─────────────────────────────────────────────
+# Step 6 rewrites the HTTP-only vhost on every run, which wipes the SSL lines
+# Certbot adds. So: if a cert already exists, ALWAYS re-apply it (even with no
+# email) so redeploys keep HTTPS. If no cert yet, issue one when an email is given.
+CERT_DIR="/etc/letsencrypt/live/$DOMAIN"
+if [ -n "$EMAIL" ] || [ -d "$CERT_DIR" ]; then
+  say "Configuring HTTPS for $DOMAIN..."
   if ! command -v certbot >/dev/null 2>&1; then
     $SUDO apt-get update -y
     $SUDO apt-get install -y certbot python3-certbot-nginx
   fi
-  $SUDO certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect
+  if [ -d "$CERT_DIR" ]; then
+    # Cert exists — re-attach it to the freshly written Nginx config.
+    $SUDO certbot --nginx -d "$DOMAIN" --non-interactive --reinstall --redirect
+  else
+    # First time — request a new certificate.
+    $SUDO certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect
+  fi
 else
-  say "Skipping HTTPS (no email given). Run later with:"
+  say "Skipping HTTPS (no email and no existing cert). Enable later with:"
   echo "  sudo apt-get install -y certbot python3-certbot-nginx"
   echo "  sudo certbot --nginx -d $DOMAIN"
 fi
