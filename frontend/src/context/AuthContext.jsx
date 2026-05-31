@@ -7,7 +7,7 @@ export const useAuth = () => useContext(AuthContext)
 
 // API base URL. Override at build/deploy time with VITE_API_URL
 // (e.g. "/api" when the backend is reverse-proxied on the same domain).
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4009/api'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)

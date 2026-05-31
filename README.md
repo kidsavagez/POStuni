@@ -40,7 +40,7 @@ cd POStuni
 cd backend
 cp .env.example .env        # then edit .env (set JWT_SECRET)
 npm install
-npm run dev                 # → http://localhost:3001  (auto-restarts on change)
+npm run dev                 # → http://localhost:4009  (auto-restarts on change)
 
 # 3. Frontend (in a second terminal)
 cd frontend
@@ -128,7 +128,7 @@ server {
 
     # Backend API (reverse proxy → matches VITE_API_URL=/api)
     location /api {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:4009;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -161,7 +161,7 @@ replace `better-sqlite3` with `pg` and update the connection in
 
 | Variable                 | Description                                              |
 |--------------------------|----------------------------------------------------------|
-| `PORT`                   | API port (default `3001`)                                |
+| `PORT`                   | API port (default `4009`)                                |
 | `JWT_SECRET`             | Secret for signing JWTs — **change in production**       |
 | `TELEGRAM_BOT_TOKEN`     | Optional; enables order notifications                    |
 | `TELEGRAM_ADMIN_CHAT_ID` | Optional; chat that receives notifications               |
@@ -171,7 +171,7 @@ replace `better-sqlite3` with `pg` and update the connection in
 
 | Variable       | Description                                                   |
 |----------------|---------------------------------------------------------------|
-| `VITE_API_URL` | API base URL. Unset = `http://localhost:3001/api`; `/api` in prod |
+| `VITE_API_URL` | API base URL. Unset = `http://localhost:4009/api`; `/api` in prod |
 
 ---
 

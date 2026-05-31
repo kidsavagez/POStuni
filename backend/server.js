@@ -38,7 +38,7 @@ const auditRoutes     = require('./routes/audit');
 const analyticsRoutes = require('./routes/analytics');
 
 const app  = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4009;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
